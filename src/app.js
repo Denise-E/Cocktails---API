@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
+const fetch = require('node-fetch');
 const app = express();
+
 
 app.set('port', (process.env.PORT || 3000));
 app.set('view engine', 'ejs');
@@ -14,5 +16,16 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}))
 
 app.get('/', function (req,res) {
-    return res.render('index');
+   fetch('https://the-cocktail-db.p.rapidapi.com/popular.php', {
+       method: 'GET',
+       headers: {
+           'Content-type': 'application/json'
+       }
+   })
+   .then(res => res.json())
+   .then(data => {
+       res.render('index', { 
+           data: data
+       })})
+   .catch(err => res.send(err));
 })
